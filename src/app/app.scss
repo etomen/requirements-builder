@@ -38,7 +38,6 @@ button:disabled {
 .filters,
 .summary,
 .content,
-.editor-head,
 .row-main,
 .row-actions,
 .meta,
@@ -164,18 +163,15 @@ textarea {
 }
 
 .content {
-  align-items: flex-start;
-  gap: 22px;
+  display: block;
 }
 
 .list {
-  flex: 1 1 58%;
   display: grid;
   gap: 12px;
 }
 
-.requirement-row,
-.editor {
+.requirement-row {
   border: 1px solid #d7dce5;
   border-radius: 8px;
   background: white;
@@ -263,61 +259,6 @@ textarea {
   text-align: center;
 }
 
-.editor {
-  position: sticky;
-  top: 18px;
-  flex: 0 1 520px;
-  padding: 18px;
-}
-
-.editor-head {
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 18px;
-}
-
-form {
-  display: grid;
-  gap: 14px;
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.audit {
-  margin-top: 22px;
-  border-top: 1px solid #d7dce5;
-  padding-top: 16px;
-}
-
-.audit h3 {
-  margin-bottom: 0.75rem;
-  font-size: 0.95rem;
-}
-
-.audit p {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  color: #5b667a;
-  font-size: 0.86rem;
-}
-
-@media (max-width: 980px) {
-  .content {
-    display: grid;
-  }
-
-  .editor {
-    position: static;
-    width: 100%;
-  }
-}
-
 @media (max-width: 640px) {
   .workspace {
     width: min(100% - 20px, 1440px);
@@ -325,19 +266,13 @@ form {
   }
 
   .topbar,
-  .row-main,
-  .editor-head {
+  .row-main {
     align-items: stretch;
     flex-direction: column;
   }
 
   .filters label,
-  .filters button,
-  .form-grid {
+  .filters button {
     width: 100%;
-  }
-
-  .form-grid {
-    grid-template-columns: 1fr;
   }
 }

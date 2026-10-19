@@ -1,7 +1,9 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Component, OnInit, PLATFORM_ID, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { RequirementsApiService } from './requirements-api.service';
+import { RequirementEditorDialog, RequirementForm } from './requirement-editor-dialog';
 import {
   ApplicationProfile,
   CreateRequirementRequest,
@@ -17,28 +19,16 @@ import {
   User,
 } from './requirements.models';
 
-interface RequirementForm {
-  title: string;
-  description: string;
-  status: RequirementStatus;
-  priority: RequirementPriority;
-  type: RequirementType;
-  ownerId: string;
-  tags: string;
-  acceptanceCriteria: string;
-  points: number | null;
-  hours: number | null;
-}
-
 @Component({
   selector: 'app-root',
-  imports: [FormsModule],
+  imports: [FormsModule, MatDialogModule],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
 export class App implements OnInit {
   private readonly api = inject(RequirementsApiService);
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly dialog = inject(MatDialog);
 
   protected readonly statuses = REQUIREMENT_STATUSES;
   protected readonly priorities = REQUIREMENT_PRIORITIES;
@@ -142,7 +132,10 @@ export class App implements OnInit {
     request.subscribe({
       next: (requirement) => {
         this.saving.set(false);
-        this.editRequirement(requirement);
+        this.editingRequirementId.set(requirement.id);
+        this.selectedRequirement.set(requirement);
+        this.setForm(requirement);
+        this.loadAudit(requirement.id);
         this.searchRequirements();
       },
       error: (error) => {
@@ -155,6 +148,20 @@ export class App implements OnInit {
   protected editRequirement(requirement: Requirement): void {
     this.editingRequirementId.set(requirement.id);
     this.selectedRequirement.set(requirement);
+    this.setForm(requirement);
+    this.loadAudit(requirement.id);
+    this.openRequirementEditor();
+  }
+
+  protected newRequirement(): void {
+    this.editingRequirementId.set(null);
+    this.selectedRequirement.set(null);
+    this.auditEntries.set([]);
+    this.form = this.emptyForm();
+    this.openRequirementEditor();
+  }
+
+  private setForm(requirement: Requirement): void {
     this.form = {
       title: requirement.title,
       description: requirement.description ?? '',
@@ -167,14 +174,30 @@ export class App implements OnInit {
       points: requirement.estimate?.points ?? null,
       hours: requirement.estimate?.hours ?? null,
     };
-    this.loadAudit(requirement.id);
   }
 
-  protected newRequirement(): void {
-    this.editingRequirementId.set(null);
-    this.selectedRequirement.set(null);
-    this.auditEntries.set([]);
-    this.form = this.emptyForm();
+  private openRequirementEditor(): void {
+    const dialogRef = this.dialog.open(RequirementEditorDialog, {
+      data: {
+        form: this.form,
+        editing: !!this.editingRequirementId(),
+        statuses: this.statuses,
+        priorities: this.priorities,
+        types: this.types,
+        users: this.users(),
+        auditEntries: this.auditEntries(),
+      },
+      width: 'min(760px, calc(100vw - 32px))',
+      maxWidth: 'calc(100vw - 24px)',
+      maxHeight: '90vh',
+      panelClass: 'requirement-editor-dialog',
+    });
+
+    dialogRef.afterClosed().subscribe((submitted) => {
+      if (submitted) {
+        this.saveRequirement();
+      }
+    });
   }
 
   protected archiveRequirement(requirement: Requirement): void {

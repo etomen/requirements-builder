@@ -16,7 +16,7 @@ const ApplicationSchema = new Schema<IApplication>({
   description: { type: String },
   poc: {
     name: String,
-    email: String
+    email: String                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     8
   },
   type: { type: String, enum: ["internal","external","partner","other"], default: "internal" }
 }, { timestamps: true });

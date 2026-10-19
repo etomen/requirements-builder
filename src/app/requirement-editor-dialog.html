@@ -1,0 +1,114 @@
+<form class="dialog-form" (ngSubmit)="submit()">
+  <header
+    class="dialog-head"
+    mat-dialog-title
+    cdkDrag
+    cdkDragRootElement=".cdk-overlay-pane"
+    cdkDragHandle
+  >
+    <div>
+      <p class="eyebrow">{{ data.editing ? 'Editing' : 'Create' }}</p>
+      <h2>{{ data.editing ? data.form.title || 'Requirement' : 'New requirement' }}</h2>
+    </div>
+    <button type="button" class="secondary" aria-label="Close editor" (click)="close()">
+      Close
+    </button>
+  </header>
+
+  <div mat-dialog-content class="dialog-content">
+    <label>
+      <span>Title</span>
+      <input type="text" name="title" [(ngModel)]="data.form.title" required />
+    </label>
+
+    <label>
+      <span>Description</span>
+      <textarea name="description" rows="4" [(ngModel)]="data.form.description"></textarea>
+    </label>
+
+    <div class="form-grid">
+      <label>
+        <span>Status</span>
+        <select name="status" [(ngModel)]="data.form.status">
+          @for (status of data.statuses; track status) {
+            <option [value]="status">{{ status }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        <span>Priority</span>
+        <select name="priority" [(ngModel)]="data.form.priority">
+          @for (priority of data.priorities; track priority) {
+            <option [value]="priority">{{ priority }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        <span>Type</span>
+        <select name="type" [(ngModel)]="data.form.type">
+          @for (type of data.types; track type) {
+            <option [value]="type">{{ type }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        <span>Owner</span>
+        <select name="ownerId" [(ngModel)]="data.form.ownerId">
+          <option value="">Unassigned</option>
+          @for (user of data.users; track user.id) {
+            <option [value]="user.id">{{ user.name }}</option>
+          }
+        </select>
+      </label>
+    </div>
+
+    <div class="form-grid">
+      <label>
+        <span>Points</span>
+        <input type="number" min="0" name="points" [(ngModel)]="data.form.points" />
+      </label>
+
+      <label>
+        <span>Hours</span>
+        <input type="number" min="0" step="0.5" name="hours" [(ngModel)]="data.form.hours" />
+      </label>
+    </div>
+
+    <label>
+      <span>Tags</span>
+      <input type="text" name="tags" [(ngModel)]="data.form.tags" placeholder="security, api" />
+    </label>
+
+    <label>
+      <span>Acceptance criteria</span>
+      <textarea
+        name="acceptanceCriteria"
+        rows="5"
+        [(ngModel)]="data.form.acceptanceCriteria"
+        placeholder="One criterion per line"
+      ></textarea>
+    </label>
+
+    @if (data.auditEntries.length) {
+      <aside class="audit" aria-label="Audit history">
+        <h3>Audit</h3>
+        @for (entry of data.auditEntries; track entry.id) {
+          <p>
+            <strong>{{ entry.changeType }}</strong>
+            <span>{{ entry.createdAt }}</span>
+          </p>
+        }
+      </aside>
+    }
+  </div>
+
+  <footer mat-dialog-actions align="end">
+    <button type="button" class="secondary" (click)="close()">Cancel</button>
+    <button type="submit" class="primary">
+      {{ data.editing ? 'Save changes' : 'Create requirement' }}
+    </button>
+  </footer>
+</form>
